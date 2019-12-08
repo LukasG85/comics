@@ -8,7 +8,12 @@ export default function ComicScreen(props) {
   let deviceWidth = Dimensions.get("window").width;
 
   return (
-    <Animatable.View animation="zoomInUp" duration={400} style={styles.image}>
+    <Animatable.View
+      animation="fadeInUp"
+      duration={400}
+      delay={400}
+      style={styles.image}
+    >
       <AutoHeightImage width={deviceWidth} source={{ uri: img }} />
     </Animatable.View>
   );
