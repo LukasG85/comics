@@ -5,16 +5,17 @@ import {
   View,
   FlatList,
   ImageBackground,
-  Button
+  Button,
+  Image
 } from "react-native";
 import * as Animatable from "react-native-animatable";
-
 import ComicsItem from "./ComicsItem";
 import background from "../img/bcg.jpg";
 
 export default function App(props) {
   const [comics, setComics] = useState([]);
   const [currentComicsNum, setCurrentComicsNum] = useState(null);
+  const [error, setError] = useState(false);
 
   const getCurrentComics = () => {
     fetch(`https://xkcd.com/info.0.json`)
@@ -22,7 +23,8 @@ export default function App(props) {
       .then(data => {
         setComics([...comics, data]);
         setCurrentComicsNum(data.num);
-      });
+      })
+      .catch(error => setError(true));
   };
 
   const getRestComics = () => {
@@ -47,7 +49,6 @@ export default function App(props) {
   useEffect(() => {
     getRestComics();
   }, [currentComicsNum]);
-
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -68,14 +69,23 @@ export default function App(props) {
             keyExtractor={item => item.title}
           />
         ) : (
-          <Animatable.View
-            animation="pulse"
-            duration={600}
-            iterationCount="infinite"
-            style={styles.loading}
-          >
-            <Text style={styles.text}>Loading Comics...</Text>
-          </Animatable.View>
+          <View style={styles.message}>
+            {error ? (
+              <View style={styles.messageContainer}>
+                <Text style={styles.error}>I can't find comics :/</Text>
+              </View>
+            ) : (
+              <View style={styles.messageContainer}>
+                <Animatable.View
+                  animation="pulse"
+                  duration={600}
+                  iterationCount="infinite"
+                >
+                  <Text style={styles.text}>Loading Comics...</Text>
+                </Animatable.View>
+              </View>
+            )}
+          </View>
         )}
         <View>
           <Button
@@ -94,13 +104,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff"
   },
-  loading: {
+  message: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
   },
+  messageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    width: "100%"
+  },
   text: {
     color: "#eece1a",
+    fontSize: 38,
+    fontWeight: "bold"
+  },
+  error: {
+    color: "#CF000F",
     fontSize: 38,
     fontWeight: "bold"
   }
